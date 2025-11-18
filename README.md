@@ -1,5 +1,5 @@
 # StateMachineTree
- System for creating non-animation state machines using Godot's AnimationTrees
+ System for creating non-animation state machines using Godot's AnimationTrees. Godot's AnimationStateMachine interface is super convenient for managing Animation States, its a shame it can't be used to drive behaviour rather than Animation... Or can it?
 
 ## StateTree
 - Holds lists of StateCallbacks
