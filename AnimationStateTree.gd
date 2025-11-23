@@ -1,7 +1,7 @@
 @tool
-class_name StateTree
+class_name AnimationStateTree
 extends AnimationTree
-## A State Machine that uses Godot's AnimationNodeStateMachine to allow for easy State Machine creation.
+## An Animation State Machine based on the behaviour of the StateTree node.
 
 var current_state = ""
 var state_player : AnimationPlayer
@@ -17,16 +17,6 @@ var empty_update = StateMethodList.new()
 
 func _enter_tree() -> void:
 	if Engine.is_editor_hint() && get_child_count() < 1:
-		var new_player = AnimationPlayer.new() as AnimationPlayer
-		var new_library = AnimationLibrary.new() as AnimationLibrary
-		var new_animation = Animation.new() as Animation
-		new_animation.length = 1.0
-		new_library.add_animation("State", new_animation)
-		new_player.add_animation_library("", new_library)
-		add_child(new_player)
-		new_player.name = "StatePlayer"
-		new_player.owner = get_tree().edited_scene_root
-		anim_player = get_path_to(new_player)
 		tree_root = AnimationNodeStateMachine.new()
 
 func _ready():
