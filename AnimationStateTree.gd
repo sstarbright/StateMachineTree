@@ -6,6 +6,7 @@ extends AnimationTree
 var current_state = ""
 var state_player : AnimationPlayer
 var empty_update = StateMethodList.new()
+var state_machine : AnimationNodeStateMachinePlayback
 @onready var current_update = empty_update
 
 # Callbacks invoked when the specified State is entered.
@@ -16,11 +17,12 @@ var empty_update = StateMethodList.new()
 @export var exit_callbacks : Dictionary[String, StateCallbackList]
 
 func _enter_tree() -> void:
-	if Engine.is_editor_hint() && get_child_count() < 1:
+	if Engine.is_editor_hint() && tree_root == null:
 		tree_root = AnimationNodeStateMachine.new()
 
 func _ready():
 	if !Engine.is_editor_hint():
+		state_machine = get("parameters/playback")
 		state_player = get_node_or_null(anim_player) as AnimationPlayer
 		
 		if state_player:
@@ -36,28 +38,31 @@ func _ready():
 			for state_node in node_list:
 				if state_node != "Start" && state_node != "End":
 					var animation_to_copy = tree_root.get_node(state_node) as AnimationNode
+					var state_split = animation_to_copy.animation.split("/") as PackedStringArray
+					var old_library = state_player.get_animation_library(state_split[0])
 					if animation_to_copy is AnimationNodeAnimation:
-						target_library.add_animation(state_node, target_library.get_animation(animation_to_copy.animation))
+						target_library.add_animation(state_node, old_library.get_animation(state_split[state_split.size()-1]))
 						animation_to_copy.animation = state_node
-			animation_started.connect(state_change)
 
 # Called internally on State change.
 func state_change(state_name : String):
-	if !Engine.is_editor_hint():
-		# Calls an exit function for the current state, if there is one
-		if current_state.length() > 0 && exit_callbacks.has(current_state):
-			exit_callbacks[current_state].invoke()
-		
-		# Calls an enter function for the current state, if there is one
-		current_state = state_name
-		if entry_callbacks.has(current_state):
-			entry_callbacks[current_state].invoke()
-		if update_callbacks.has(current_state):
-			current_update = update_callbacks[current_state]
-		else:
-			current_update = empty_update
+	# Calls an exit function for the current state, if there is one
+	if current_state.length() > 0 && exit_callbacks.has(current_state):
+		exit_callbacks[current_state].invoke()
+	
+	# Calls an enter function for the current state, if there is one
+	current_state = state_name
+	if entry_callbacks.has(current_state):
+		entry_callbacks[current_state].invoke()
+	if update_callbacks.has(current_state):
+		current_update = update_callbacks[current_state]
+	else:
+		current_update = empty_update
 
 func _physics_process(_delta: float) -> void:
 	if !Engine.is_editor_hint():
 		# Calls an update callbacks for the current state
 		current_update.invoke()
+		var new_current_state := state_machine.get_current_node()
+		if current_state != new_current_state:
+			state_change(new_current_state)
