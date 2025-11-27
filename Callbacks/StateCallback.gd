@@ -5,5 +5,5 @@ extends Resource
 func setup(_parent_node : Node):
 	pass
 
-func invoke():
+func invoke(_args : Array) -> void:
 	pass

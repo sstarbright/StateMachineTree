@@ -4,6 +4,10 @@ extends Resource
 
 @export var callbacks : Array[StateMethodCallback]
 
-func invoke():
+func setup(parent_node : Node):
 	for callback in callbacks:
-		callback.invoke()
+		callback.setup(parent_node)
+
+func invoke(...args):
+	for callback in callbacks:
+		callback.invoke(args)

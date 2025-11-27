@@ -3,5 +3,6 @@ extends StateMethodCallback
 
 @export var target_resource : Resource
 
-func invoke():
-	target_resource.callv(method_name, method_arguments)
+func invoke(args : Array):
+	args.append_array(method_arguments)
+	target_resource.callv(method_name, args)

@@ -8,6 +8,6 @@ func setup(parent_node : Node):
 	for callback in callbacks:
 		callback.setup(parent_node)
 
-func invoke():
+func invoke(...args):
 	for callback in callbacks:
-		callback.invoke()
+		callback.invoke(args)
