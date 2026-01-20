@@ -61,8 +61,9 @@ func state_change(state_name : String):
 
 func _physics_process(delta: float) -> void:
 	if !Engine.is_editor_hint():
-		# Calls an update callbacks for the current state
-		current_update.invoke(delta)
 		var new_current_state := state_machine.get_current_node()
 		if current_state != new_current_state:
 			state_change(new_current_state)
+		else:
+			# Calls an update callbacks for the current state
+			current_update.invoke(delta)
