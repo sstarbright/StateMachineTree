@@ -37,10 +37,10 @@ func _ready():
 			var node_list = tree_root.get_node_list()
 			for state_node in node_list:
 				if state_node != "Start" && state_node != "End":
-					var animation_to_copy = tree_root.get_node(state_node) as AnimationNode
-					var state_split = animation_to_copy.animation.split("/") as PackedStringArray
-					var old_library = state_player.get_animation_library(state_split[0])
+					var animation_to_copy = tree_root.get_node(state_node)
 					if animation_to_copy is AnimationNodeAnimation:
+						var state_split = animation_to_copy.animation.split("/") as PackedStringArray
+						var old_library = state_player.get_animation_library(state_split[0])
 						target_library.add_animation(state_node, old_library.get_animation(state_split[state_split.size()-1]))
 						animation_to_copy.animation = state_node
 
