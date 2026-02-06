@@ -3,7 +3,7 @@ class_name AnimationStateTree
 extends AnimationTree
 ## An Animation State Machine based on the behaviour of the StateTree node.
 
-var current_state = ""
+var current_state := ""
 var state_player : AnimationPlayer
 var empty_update = StateMethodList.new()
 var state_machine : AnimationNodeStateMachinePlayback
@@ -44,14 +44,21 @@ func _ready():
 						target_library.add_animation(state_node, old_library.get_animation(state_split[state_split.size()-1]))
 						animation_to_copy.animation = state_node
 
+# Overriddable function called on State change.
+func state_change(old_state : String, new_state : String):
+	pass
+
 # Called internally on State change.
-func state_change(state_name : String):
+func change_state(state_name : String):
 	# Calls an exit function for the current state, if there is one
 	if current_state.length() > 0 && exit_callbacks.has(current_state):
 		exit_callbacks[current_state].invoke()
 	
-	# Calls an enter function for the current state, if there is one
+	var old_state = current_state
 	current_state = state_name
+	state_change(old_state, current_state)
+	
+	# Calls an enter function for the current state, if there is one
 	if entry_callbacks.has(current_state):
 		entry_callbacks[current_state].invoke()
 	if update_callbacks.has(current_state):
@@ -63,7 +70,7 @@ func _physics_process(delta: float) -> void:
 	if !Engine.is_editor_hint():
 		var new_current_state := state_machine.get_current_node()
 		if current_state != new_current_state:
-			state_change(new_current_state)
+			change_state(new_current_state)
 		else:
 			# Calls an update callbacks for the current state
 			current_update.invoke(delta)
